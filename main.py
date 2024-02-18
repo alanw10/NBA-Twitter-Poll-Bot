@@ -1,19 +1,5 @@
-import random, tweepy
+import random, tweepy, time, schedule
 from nba_api.stats.static import players
-
-# gets the players names from the nba_api
-nba_players = players.get_players()
-
-
-active_players = [player for player in nba_players if player['is_active']]
-
-
-random_active_player = random.choice(active_players)
-random_active_player2 = random.choice(active_players)
-
-player1 = random_active_player['full_name']
-player2 = random_active_player2['full_name']
-
 
 # Enter API tokens below
 bearer_token = '' # not needed for this
@@ -37,8 +23,27 @@ client = tweepy.Client(
 )
 
 #tweeting part
-text = "Who is the better player?"
-poll_options = [player1,player2]
-# Send Tweet with Text and poll options
-client.create_tweet(text=text,poll_options = poll_options,poll_duration_minutes=1440) 
-print("Tweeted!")
+def tweet():
+    # gets the players names from the nba_api
+    nba_players = players.get_players()
+
+
+    active_players = [player for player in nba_players if player['is_active']]
+
+
+    random_active_player = random.choice(active_players)
+    random_active_player2 = random.choice(active_players)
+
+    player1 = random_active_player['full_name']
+    player2 = random_active_player2['full_name']
+    # Text to be Tweeted
+    text = "Who is the better player?"
+    poll_options = [player1,player2]
+    # Send Tweet with Text and poll options
+    client.create_tweet(text=text,poll_options = poll_options,poll_duration_minutes=1440) 
+    print("Tweeted!")
+    
+schedule.every().hour.do(tweet)# tweets every hour
+while True:
+    schedule.run_pending()
+    time.sleep(1)
